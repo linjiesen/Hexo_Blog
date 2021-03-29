@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Hello World]]></title>
+    <url>%2F2021%2F02%2F23%2Fhello-world%2F</url>
+    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
+  </entry>
+  <entry>
+    <title><![CDATA[Django开发中X-Frame-Options-to-deny问题记录解决]]></title>
+    <url>%2F2020%2F01%2F29%2FDjango%E5%BC%80%E5%8F%91%E4%B8%ADX-Frame-Options-to-deny%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95%E8%A7%A3%E5%86%B3%2F</url>
+    <content type="text"><![CDATA[问题描述:Django框架写网页项目时，用到插件editor.md实现网页端富文本编辑器，实现图片跨域上传时，返回Json值成功，但MarkDown编辑器中没有图片 上传成功但没有显示图片地址 浏览器F12打开调试模式后发现异常 报错如下：1Refused to display &apos;http://127.0.0.1:8000/&apos; in a frame because it set &apos;X-Frame-Options&apos; to &apos;deny&apos;. 由于借用的是开源模板，而且图片使用的是跨域上传方式，将文件存放在腾讯云平台cos中，搜索查询到的问题是frame架构中间人攻击的相关bug，在谷歌上找到线索，问题原因：（官方文档的答案） clickjacking中间件和装饰器提供了易于使用的保护，以防止clickjacking。当恶意站点诱使用户单击他们已加载到隐藏框架或iframe中的另一个站点的隐藏元素时，会发生这种类型的攻击。 现代浏览器采用X-Frame-Options HTTP标头，该标头指示是否允许在框架或iframe中加载资源。如果响应包含标头值为的标头，SAMEORIGIN则浏览器将仅在请求源自同一站点的情况下将资源加载到框架中。如果将标头设置为，DENY则无论哪个站点发出请求，浏览器都将阻止资源加载到框架中。 Django提供了几种在您的网站响应中包含此标头的方法： 在所有响应中设置标头的中间件。 一组视图装饰器，可用于覆盖中间件或仅为某些视图设置标头。 如果X-Frame-OptionsHTTP头尚未在响应中出现，则仅由中间件或视图装饰器设置。 在Django 3.0中进行了更改： 设置的默认值X_FRAME_OPTIONS从更改SAMEORIGIN为DENY 出现问题的原因在setting中的中间件： 123456789MIDDLEWARE = [ &apos;django.middleware.security.SecurityMiddleware&apos;, &apos;django.contrib.sessions.middleware.SessionMiddleware&apos;, &apos;django.middleware.common.CommonMiddleware&apos;, &apos;django.middleware.csrf.CsrfViewMiddleware&apos;, &apos;django.contrib.auth.middleware.AuthenticationMiddleware&apos;, &apos;django.contrib.messages.middleware.MessageMiddleware&apos;, &apos;django.middleware.clickjacking.XFrameOptionsMiddleware&apos;,] 解决方法 注释掉中间件，但这样容易遭受中间人攻击 在view视图中添加装饰器 12345678910111213141516171819202122232425262728293031323334353637383940414243from django.views.decorators.csrf import csrf_exemptfrom django.views.decorators.clickjacking import xframe_options_exempt# 网页中无法添加csrf token， 可在view函数处添加装饰器csrf_exempt(存放于包django.views.decorators.csrf中)@xframe_options_exempt@csrf_exemptdef wiki_upload(request, project_id): &quot;&quot;&quot; markdown插件上传图片 &quot;&quot;&quot; result = &#123; &apos;success&apos;: 0, &apos;message&apos;: None, &apos;url&apos;: None, &#125; image_object = request.FILES.get(&apos;editormd-image-file&apos;) if not image_object: result[&apos;message&apos;] = &quot;文件不存在&quot; return JsonResponse(result) ext = image_object.name.rsplit(&apos;.&apos;)[-1] # 获取文件后缀名 key = &quot;&#123;&#125;.&#123;&#125;&quot;.format(uid(request.tracer.user.mobile_phone), ext) # 文件对象上传到当前项目的桶中 image_url = upload_file( bucket=request.tracer.project.bucket, region=request.tracer.project.region, file_object=image_object, key=key, ) print(image_url) result = &#123; &apos;success&apos;: 1, &apos;message&apos;: None, &apos;url&apos;: image_url, &#125; print(result) print(JsonResponse(result)) return JsonResponse(result) 在settings中设置X_FRAME_OPTIONS = ‘SAMEORIGIN’ 解决后 可以正常上传]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>Django</tag>
+        <tag>Web</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Anaconda笔记]]></title>
     <url>%2F2019%2F05%2F25%2FAnaconda%E7%AC%94%E8%AE%B0%2F</url>
     <content type="text"><![CDATA[conda install nb_conda]]></content>
@@ -77,10 +95,5 @@
         <tag>Hexo</tag>
         <tag>Github</tag>
       </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[Hello World]]></title>
-    <url>%2F2019%2F03%2F16%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
   </entry>
 </search>
